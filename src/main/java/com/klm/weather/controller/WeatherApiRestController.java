@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import com.klm.weather.model.Weather;
 import com.klm.weather.service.WeatherService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/weather")
 public class WeatherApiRestController {
@@ -21,6 +24,7 @@ public class WeatherApiRestController {
     
     @PostMapping
     public ResponseEntity<Weather> createWeather(@RequestBody Weather weather) {
+    	log.info("Posting weather data: " +weather);
         Weather createdWeather = service.save(weather);
         return ResponseEntity.status(201).body(createdWeather);
     }
@@ -30,16 +34,18 @@ public class WeatherApiRestController {
             @RequestParam(required = false) String date,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String sort) {
-        
+    	log.info("Getting weather data");
         List<String> cities = city != null ? List.of(city.toLowerCase().split(",")) : null;
         List<Weather> weatherList = service.findAll(date, cities, sort);
-
+        log.info("weather data fetched: "+weatherList);
         return ResponseEntity.ok(weatherList);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Weather> getWeatherById(@PathVariable int id) {
+    	log.info("get Weather By Id: "+id);
     	Optional<Weather> weather = service.findById(id);
+    	log.info("Weather fetched: "+weather);
     	if (weather.isPresent()) {
     	    return ResponseEntity.ok(weather.get());
     	} else {

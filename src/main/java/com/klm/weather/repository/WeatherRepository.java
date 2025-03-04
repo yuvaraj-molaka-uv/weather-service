@@ -1,6 +1,8 @@
 package com.klm.weather.repository;
 
 import com.klm.weather.model.Weather;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -8,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Repository
 public class WeatherRepository {
 	private final Map<Integer, Weather> weatherData = new ConcurrentHashMap<>();
@@ -16,6 +19,7 @@ public class WeatherRepository {
     public Weather save(Weather weather) {
         weather.setId(idGenerator.getAndIncrement());
         weatherData.put(weather.getId(), weather);
+        log.info("weather information saved");
         return weather;
     }
 
