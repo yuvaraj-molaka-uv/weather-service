@@ -1,5 +1,6 @@
 package com.klm.weather.controller;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,36 +17,36 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/weather")
 public class WeatherApiRestController {
 
-	private final WeatherService service;
+    private final WeatherService weatherService;
 
-    public WeatherApiRestController(WeatherService service) {
-        this.service = service;
+    public WeatherApiRestController(WeatherService weatherService) {
+        this.weatherService = weatherService;
     }
     
     @PostMapping
     public ResponseEntity<Weather> createWeather(@RequestBody Weather weather) {
-    	log.info("Posting weather data: " +weather);
-        Weather createdWeather = service.save(weather);
+        log.info("Posting weather data: {}", weather);
+        Weather createdWeather = weatherService.saveWeather(weather);
         return ResponseEntity.status(201).body(createdWeather);
     }
 
     @GetMapping
-    public ResponseEntity<List<Weather>> getWeather(
+    public ResponseEntity<List<Weather>> getAllWeatherByOptionalParams(
             @RequestParam(required = false) String date,
             @RequestParam(required = false) String city,
-            @RequestParam(required = false) String sort) {
+            @RequestParam(required = false) String sort) throws ParseException {
     	log.info("Getting weather data");
         List<String> cities = city != null ? List.of(city.toLowerCase().split(",")) : null;
-        List<Weather> weatherList = service.findAll(date, cities, sort);
-        log.info("weather data fetched: "+weatherList);
+        List<Weather> weatherList = weatherService.getAllWeatherByOptionalParams(date, cities, sort);
+        log.info("weather data fetched: {}", weatherList);
         return ResponseEntity.ok(weatherList);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Weather> getWeatherById(@PathVariable int id) {
-    	log.info("get Weather By Id: "+id);
-    	Optional<Weather> weather = service.findById(id);
-    	log.info("Weather fetched: "+weather);
+        log.info("get Weather By Id: {}", id);
+    	Optional<Weather> weather = weatherService.getWeatherById(id);
+        log.info("Weather fetched: {}", weather);
     	if (weather.isPresent()) {
     	    return ResponseEntity.ok(weather.get());
     	} else {
